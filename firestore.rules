@@ -1,0 +1,55 @@
+rules_version = '2';
+// 「오늘의 할 일」 — 대표님 구글 계정으로 로그인했을 때만 읽고 쓴다. 그 밖은 전부 거부.
+// 네오 도구(서비스 계정, firebase-admin)는 규칙을 거치지 않는다.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['dragon2x1972@gmail.com'];
+    }
+
+    function optNumber(v) {
+      return v == null || v is number;
+    }
+
+    // todos/{id}: { id, text, done, priority, category, createdAt, completedAt }
+    function validTodo(id) {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['id', 'text', 'done', 'priority', 'category', 'createdAt', 'completedAt'])
+        && d.keys().hasAll(['id', 'text', 'done', 'priority', 'category', 'createdAt', 'completedAt'])
+        && d.id == id
+        && d.text is string && d.text.size() <= 2000
+        && d.done is bool
+        && d.priority in ['A', 'B', 'C', 'D']
+        && d.category in ['work', 'home']
+        && optNumber(d.createdAt)
+        && optNumber(d.completedAt);
+    }
+
+    // history/{id}: 완료 기록 { date, time, priority, text, id, completedAt }
+    function validHistory(id) {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['date', 'time', 'priority', 'text', 'id', 'completedAt'])
+        && d.keys().hasAll(['date', 'time', 'priority', 'text', 'id', 'completedAt'])
+        && d.id == id
+        && d.date is string && d.date.size() == 10
+        && d.time is string && d.time.size() <= 5
+        && d.priority in ['A', 'B', 'C', 'D']
+        && d.text is string && d.text.size() <= 2000
+        && d.completedAt is number;
+    }
+
+    match /todos/{id} {
+      allow read, delete: if isOwner();
+      allow create, update: if isOwner() && validTodo(id);
+    }
+
+    match /history/{id} {
+      allow read, delete: if isOwner();
+      allow create, update: if isOwner() && validHistory(id);
+    }
+  }
+}
