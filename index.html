@@ -149,6 +149,87 @@
   }
   .cat-btn.active .cat-count { background: var(--primary); color: var(--on-primary); }
 
+  /* ─── 직장/집 + 날짜 이동줄 (2026-10-09 날짜 기능) ─── */
+  .switch-row {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--md);
+    margin-bottom: var(--lg);
+  }
+  .switch-row .cat-switch { margin-bottom: 0; }
+  .date-nav {
+    display: inline-flex; align-items: center; gap: 2px; padding: var(--xs);
+    background: var(--surface-soft);
+    border: 1px solid var(--hairline-soft);
+    border-radius: var(--r-full);
+  }
+  .date-step, .date-today {
+    border: 0; background: transparent; color: var(--muted);
+    height: 38px; border-radius: var(--r-full);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all .15s ease;
+  }
+  .date-step { width: 34px; padding: 0; }
+  .date-step svg { width: 16px; height: 16px; }
+  .date-step:hover, .date-today:hover { color: var(--ink); background: var(--canvas); }
+  .date-today { padding: 0 12px; font-size: 13px; font-weight: 600; }
+  .date-today:disabled { color: var(--muted-soft); background: transparent; cursor: default; }
+  .date-label {
+    position: relative; display: inline-flex; align-items: center;
+    height: 38px; padding: 0 14px; border-radius: var(--r-full);
+    background: var(--canvas); box-shadow: var(--shadow-1);
+    font-size: 15px; font-weight: 600; color: var(--ink);
+    font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer;
+  }
+  .date-label.not-today { color: var(--primary); }
+  /* 달력: 투명한 <input type=date> 를 단추 위에 겹쳐 둔다(폰은 눌러서 바로, PC 는 showPicker). */
+  .date-overlay {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; border: 0; padding: 0; margin: 0; cursor: pointer;
+    font-size: 16px;   /* iOS 확대 방지 */
+  }
+  .date-overlay::-webkit-calendar-picker-indicator { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; }
+
+  /* 입력칸 옆 달력 단추 */
+  .add-date {
+    position: relative; flex-shrink: 0;
+    height: 36px; min-width: 36px; padding: 0 8px; margin-right: 6px;
+    border-radius: var(--r-full); border: 1px solid transparent;
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    color: var(--muted-soft); font-size: 13px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .add-date:hover { color: var(--ink); background: var(--surface-soft); }
+  .add-date svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .add-date.picked { color: var(--primary); border-color: var(--primary-disabled); background: #fff5f7; }
+
+  /* 할 일마다 날짜 단추 */
+  .task-date {
+    position: relative; flex-shrink: 0;
+    height: 28px; min-width: 28px; padding: 0 6px;
+    border-radius: var(--r-full);
+    display: inline-flex; align-items: center; justify-content: center; gap: 3px;
+    color: var(--muted-soft); opacity: .55;
+    font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums;
+    transition: all .15s ease;
+  }
+  .task-date svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .task:hover .task-date, .task-date:hover { opacity: 1; }
+  .task-date:hover { background: var(--surface-strong); color: var(--ink); }
+  .task.overdue .task-date { opacity: 1; color: var(--error); background: #fdecea; }
+
+  /* 밀린 일 묶음 머리 */
+  .group-label {
+    display: flex; align-items: center; gap: var(--sm);
+    padding: var(--md) var(--md) var(--xs);
+    font-size: 13px; font-weight: 700; color: var(--muted);
+  }
+  .group-label .count {
+    background: var(--surface-strong); color: var(--muted);
+    padding: 1px 7px; border-radius: var(--r-full);
+    font-size: 11px; font-weight: 700;
+  }
+  .group-label.late { color: var(--error); }
+  .group-label.late .count { background: #fdecea; color: var(--error); }
+
   /* ─── Input pill (signature search-bar style) ─── */
   .input-wrap {
     margin-bottom: var(--xl); position: relative;
@@ -564,6 +645,16 @@
     .p-btn { width: 22px; height: 22px; font-size: 11px; }
     .priority-group { gap: 2px; }
     .priority-group-lg .p-btn { width: 30px; height: 30px; font-size: 13px; }
+    .priority-group-lg { margin-right: var(--sm); }
+    .switch-row { gap: var(--sm); }
+    .date-step, .date-today, .date-label { height: 34px; }
+    .date-step { width: 30px; }
+    .date-label { padding: 0 10px; font-size: 14px; }
+    .date-today { padding: 0 10px; }
+    .add-date { min-width: 32px; padding: 0 6px; margin-right: 4px; }
+    .task { gap: 10px; }
+    .task-date { padding: 0 4px; }
+    .task-del { width: 28px; }
     .celebration h2 { font-size: 28px; }
     .celebration .big { font-size: 72px; }
   }
@@ -610,6 +701,7 @@
     <p id="hero-sub">한 줄에 하나씩 적고, 끝낸 일은 체크하세요.</p>
   </section>
 
+  <div class="switch-row">
   <div class="cat-switch" role="tablist" aria-label="직장/집 목록 선택">
     <button class="cat-btn" data-cat="work" role="tab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -619,6 +711,22 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       집 <span class="cat-count" id="cat-count-home">0</span>
     </button>
+  </div>
+
+  <!-- 날짜 이동줄: ◀ 날짜 ▶ 오늘. 가운데 날짜를 누르면 달력. -->
+  <div class="date-nav" aria-label="날짜 이동">
+    <button class="date-step" id="date-prev" type="button" aria-label="전날" title="전날">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <label class="date-label" id="date-label" title="달력에서 날짜 고르기">
+      <span id="date-label-text"></span>
+      <input class="date-overlay" type="date" id="date-picker" aria-label="날짜 고르기" />
+    </label>
+    <button class="date-step" id="date-next" type="button" aria-label="다음 날" title="다음 날">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="date-today" id="date-today" type="button">오늘</button>
+  </div>
   </div>
 
   <div class="input-wrap">
@@ -632,6 +740,11 @@
         aria-label="할 일 입력"
         spellcheck="false"
       />
+      <label class="add-date" id="add-date" title="날짜 지정 (기본: 보고 있는 날짜)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="add-date-text"></span>
+        <input class="date-overlay" type="date" id="add-date-picker" aria-label="새 할 일 날짜" />
+      </label>
       <button class="add-orb" type="submit" aria-label="추가">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
@@ -759,6 +872,28 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
   let sortByPriority = localStorage.getItem(SORT_KEY) === 'priority';
   let category = CATEGORIES.includes(localStorage.getItem(CATEGORY_KEY)) ? localStorage.getItem(CATEGORY_KEY) : 'work';
 
+  /* ─────────── 날짜 (2026-10-09) ─────────── */
+  // 할 일마다 date('YYYY-MM-DD', 서울 기준). 화면은 고른 날짜의 할 일만 보이고, 오늘 화면에서는 「밀린 일」을 따로 보인다.
+  // 날짜 계산은 기기 시간대와 상관없이 모두 서울 기준이다.
+  const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  const SEOUL_DAY = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const seoulToday = () => SEOUL_DAY.format(new Date());
+  function addDays(ds, n) {
+    const d = new Date(ds + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
+  const isDate = v => typeof v === 'string' && DATE_RE.test(v) && addDays(v, 0) === v;
+  const dateLabel = ds => `${+ds.slice(5, 7)}월 ${+ds.slice(8, 10)}일 (${DAY_NAMES[new Date(ds + 'T00:00:00Z').getUTCDay()]})`;
+  const dateShort = ds => ds ? `${+ds.slice(5, 7)}/${+ds.slice(8, 10)}` : '날짜 없음';
+  let today = seoulToday();
+  let viewDate = today;     // 보고 있는 날짜. 처음 열면 오늘(기억하지 않는다).
+  let pickedDate = null;    // 입력칸 달력으로 고른 날짜. 넣고 나면 지운다(= 보고 있는 날짜로).
+  const isOverdue = t => !t.done && !!t.date && t.date < today;
+  // 보고 있는 날짜의 일. 날짜 없는 일(옛 화면이 date 를 빼고 저장한 것)은 오늘 화면에 함께 보인다.
+  const onView = t => t.date === viewDate || (!t.date && viewDate === today);
+
   function normalizePriority(p) {
     return PRIORITIES.includes(p) ? p : 'B';
   }
@@ -818,8 +953,14 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
   renderPriorityPicker();
 
   /* ─────────── Clock ─────────── */
-  const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
   function updateClock() {
+    // 자정이 지나 서울 날짜가 바뀌면: 오늘을 보고 있었으면 새 오늘로 넘어가고(어제 못 한 일은 「밀린 일」로), 다시 그린다.
+    const t = seoulToday();
+    if (t !== today) {
+      if (viewDate === today) viewDate = t;
+      today = t;
+      render();
+    }
     const now = new Date();
     const h = now.getHours();
     const ampm = h < 12 ? '오전' : '오후';
@@ -832,23 +973,31 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
   setInterval(updateClock, 1000);
 
   /* ─────────── Rendering ─────────── */
+  // 보고 있는 구분(직장/집) + 보고 있는 날짜의 할 일. 진행률·개수·비우기는 모두 이 범위다.
   function catTasks() {
-    return tasks.filter(t => t.category === category);
+    return tasks.filter(t => t.category === category && onView(t));
+  }
+  // 오늘 화면에서만: 오늘보다 앞 날짜인데 안 끝낸 일. 오래된 날짜부터.
+  function overdueTasks() {
+    if (viewDate !== today || filter === 'done') return [];
+    return sortList(tasks.filter(t => t.category === category && isOverdue(t)))
+      .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  }
+  function sortList(list) {
+    if (!sortByPriority) return list;
+    return [...list].sort((a, b) => {
+      const pa = PRIORITIES.indexOf(a.priority);
+      const pb = PRIORITIES.indexOf(b.priority);
+      if (pa !== pb) return pa - pb;
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
   }
   function visibleTasks() {
     const scoped = catTasks();
     let list = scoped;
     if (filter === 'active') list = scoped.filter(t => !t.done);
     if (filter === 'done') list = scoped.filter(t => t.done);
-    if (sortByPriority) {
-      list = [...list].sort((a, b) => {
-        const pa = PRIORITIES.indexOf(a.priority);
-        const pb = PRIORITIES.indexOf(b.priority);
-        if (pa !== pb) return pa - pb;
-        return (b.createdAt || 0) - (a.createdAt || 0);
-      });
-    }
-    return list;
+    return sortList(list);
   }
 
   const HERO_TEXT = {
@@ -862,19 +1011,45 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
       btn.classList.toggle('active', active);
       btn.setAttribute('aria-selected', active);
     });
+    // 남은 일 수: 보고 있는 날짜의 안 끝낸 일(오늘 화면이면 밀린 일도 더한다)
     for (const c of CATEGORIES) {
       const el = document.getElementById('cat-count-' + c);
-      if (el) el.textContent = tasks.filter(t => t.category === c && !t.done).length;
+      if (el) el.textContent = tasks.filter(t => t.category === c && !t.done && (onView(t) || (viewDate === today && isOverdue(t)))).length;
     }
-    document.getElementById('hero-title').textContent = HERO_TEXT[category].title;
+    document.getElementById('hero-title').textContent = viewDate === today
+      ? HERO_TEXT[category].title
+      : `${dateLabel(viewDate)} ${CATEGORY_LABEL[category]} 할 일`;
     document.getElementById('hero-sub').textContent = HERO_TEXT[category].sub;
+  }
+
+  function renderDateNav() {
+    const $label = document.getElementById('date-label');
+    document.getElementById('date-label-text').textContent = dateLabel(viewDate);
+    $label.classList.toggle('not-today', viewDate !== today);
+    document.getElementById('date-picker').value = viewDate;
+    document.getElementById('date-today').disabled = viewDate === today;
+    const addDate = pickedDate || viewDate;
+    document.getElementById('add-date-picker').value = addDate;
+    document.getElementById('add-date-text').textContent = pickedDate && pickedDate !== viewDate ? dateShort(pickedDate) : '';
+    document.getElementById('add-date').classList.toggle('picked', !!pickedDate && pickedDate !== viewDate);
+    $input.placeholder = pickedDate && pickedDate !== viewDate ? `${dateLabel(pickedDate)}에 넣을 할 일` : '할 일을 입력하세요';
+  }
+
+  function groupLabel(text, n, late) {
+    const li = document.createElement('li');
+    li.className = 'group-label' + (late ? ' late' : '');
+    li.innerHTML = `<span></span><span class="count">${n}</span>`;
+    li.firstChild.textContent = text;
+    return li;
   }
 
   function render() {
     const scoped = catTasks();
     const list = visibleTasks();
+    const overdue = overdueTasks();
     $list.innerHTML = '';
     renderCatSwitch();
+    renderDateNav();
 
     const total = scoped.length;
     const done = scoped.filter(t => t.done).length;
@@ -892,14 +1067,23 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
     $clearDone.disabled = done === 0;
     $clearAll.disabled = total === 0;
 
+    // 오늘 화면: 「밀린 일」 묶음을 목록 위에 따로
+    if (overdue.length) {
+      $list.appendChild(groupLabel('밀린 일', overdue.length, true));
+      for (const t of overdue) $list.appendChild(taskEl(t, true));
+      if (list.length) $list.appendChild(groupLabel(`오늘 · ${dateLabel(viewDate)}`, list.length, false));
+    }
+
     if (total === 0) {
-      $empty.style.display = 'block';
-      $emptyTitle.textContent = `${CATEGORY_LABEL[category]} 할 일이 아직 없어요`;
+      $empty.style.display = overdue.length ? 'none' : 'block';
+      $emptyTitle.textContent = viewDate === today
+        ? `${CATEGORY_LABEL[category]} 할 일이 아직 없어요`
+        : `${dateLabel(viewDate)} ${CATEGORY_LABEL[category]} 할 일이 없어요`;
       $emptySub.textContent = '위 입력창에 입력하거나 엑셀에서 붙여넣어 시작하세요.';
       return;
     }
     if (list.length === 0) {
-      $empty.style.display = 'block';
+      $empty.style.display = overdue.length ? 'none' : 'block';
       if (filter === 'active' && total > 0 && done === total) {
         $emptyTitle.textContent = '오늘 할 일을 모두 끝냈어요 ✨';
         $emptySub.textContent = '잠깐 숨 돌리고 와요.';
@@ -919,9 +1103,9 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
     }
   }
 
-  function taskEl(t) {
+  function taskEl(t, late = false) {
     const li = document.createElement('li');
-    li.className = 'task' + (t.done ? ' done' : '');
+    li.className = 'task' + (t.done ? ' done' : '') + (late ? ' overdue' : '');
     li.dataset.id = t.id;
     const pr = normalizePriority(t.priority);
     li.innerHTML = `
@@ -930,6 +1114,10 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
       </button>
       <div class="priority-group" role="radiogroup" aria-label="중요도">${priorityButtonsHTML(pr)}</div>
       <div class="task-text" role="textbox" tabindex="0"></div>
+      <label class="task-date" title="날짜 바꾸기">
+        ${late ? `<span>${dateShort(t.date)}</span>` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`}
+        <input class="date-overlay" type="date" aria-label="날짜 바꾸기" />
+      </label>
       <button class="task-del" aria-label="삭제">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
       </button>
@@ -942,6 +1130,9 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
       toggleTask(t.id, { x: rect.left + rect.width/2, y: rect.top + rect.height/2 });
     });
     li.querySelector('.task-del').addEventListener('click', () => deleteTask(t.id));
+    const $date = li.querySelector('.task-date input');
+    $date.value = t.date || today;
+    bindDatePicker($date, ds => moveTask(t.id, ds));
     li.querySelector('.priority-group').addEventListener('click', e => {
       const btn = e.target.closest('.p-btn');
       if (!btn || btn.dataset.p === t.priority) return;
@@ -972,10 +1163,18 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
   }
 
   /* ─────────── Mutations ─────────── */
+  // 새 할 일의 날짜: 입력칸 달력으로 고른 날짜, 없으면 보고 있는 날짜. 넣은 뒤에는 고른 날짜를 지운다.
+  function takeAddDate() {
+    const d = pickedDate || viewDate;
+    pickedDate = null;
+    if (d !== viewDate) setTimeout(() => showPop({ x: window.innerWidth / 2, y: 140 }, `${dateShort(d)}에 넣었어요`), 0);
+    return d;
+  }
+
   function addTask(text) {
     const v = text.trim().slice(0, MAX_TEXT);
     if (!v) return null;
-    const t = { id: uid(), text: v, done: false, priority: newTaskPriority, category, createdAt: Date.now() };
+    const t = { id: uid(), text: v, done: false, priority: newTaskPriority, category, createdAt: Date.now(), date: takeAddDate() };
     tasks.unshift(t);
     saveTasks();
     render();
@@ -985,16 +1184,27 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
   function addTasksBulk(texts) {
     const added = [];
     let at = Date.now();   // 붙여 넣은 순서가 유지되도록 1ms 씩 올린다(목록은 createdAt 최신순)
-    for (const tx of texts) {
-      const v = tx.trim().slice(0, MAX_TEXT);
-      if (!v) continue;
-      const t = { id: uid(), text: v, done: false, priority: newTaskPriority, category, createdAt: at++ };
+    const lines = texts.map(tx => tx.trim().slice(0, MAX_TEXT)).filter(Boolean);
+    if (!lines.length) return added;   // 넣을 줄이 없으면 고른 날짜도 그대로 둔다
+    const date = takeAddDate();
+    for (const v of lines) {
+      const t = { id: uid(), text: v, done: false, priority: newTaskPriority, category, createdAt: at++, date };
       tasks.unshift(t);
       added.push(t);
     }
     saveTasks();
     render();
     return added;
+  }
+
+  // 할 일 날짜 바꾸기 → 그 날짜로 옮겨 간다(완료 여부·완료 기록은 그대로).
+  function moveTask(id, ds) {
+    const t = tasks.find(x => x.id === id);
+    if (!t || !isDate(ds) || t.date === ds) return;
+    t.date = ds;
+    saveTasks();
+    render();
+    if (ds !== viewDate) showPop({ x: window.innerWidth / 2, y: 140 }, `${dateShort(ds)}로 옮겼어요`);
   }
 
   function toggleTask(id, originPoint) {
@@ -1009,7 +1219,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
       celebrateOne(originPoint, t.text);
       vibrate([8, 30, 8]);
       const scoped = catTasks();
-      const allDone = scoped.length > 0 && scoped.every(x => x.done);
+      const allDone = scoped.length > 0 && scoped.every(x => x.done) && overdueTasks().length === 0;
       if (allDone) {
         setTimeout(() => celebrateAll(), 280);
       } else {
@@ -1026,17 +1236,44 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
     render();
   }
 
+  // 비우기·초기화는 보고 있는 날짜만(다른 날짜·밀린 일은 건드리지 않는다).
   $clearDone.addEventListener('click', () => {
     if (!catTasks().some(t => t.done)) return;
-    if (!confirm(`${CATEGORY_LABEL[category]} 목록에서 완료한 일을 모두 삭제할까요?`)) return;
-    tasks = tasks.filter(t => !(t.category === category && t.done));
+    if (!confirm(`${dateLabel(viewDate)} ${CATEGORY_LABEL[category]} 목록에서 완료한 일을 모두 삭제할까요?`)) return;
+    tasks = tasks.filter(t => !(t.category === category && onView(t) && t.done));
     saveTasks(); render();
   });
   $clearAll.addEventListener('click', () => {
     if (catTasks().length === 0) return;
-    if (!confirm(`${CATEGORY_LABEL[category]} 목록의 모든 할 일을 삭제할까요?`)) return;
-    tasks = tasks.filter(t => t.category !== category);
+    if (!confirm(`${dateLabel(viewDate)} ${CATEGORY_LABEL[category]} 목록의 모든 할 일을 삭제할까요?
+(다른 날짜와 밀린 일은 그대로 둡니다)`)) return;
+    tasks = tasks.filter(t => !(t.category === category && onView(t)));
     saveTasks(); render();
+  });
+
+  /* ─────────── 날짜 이동·달력 ─────────── */
+  // 투명한 <input type=date> 를 단추 위에 겹쳐 둔다. 폰은 눌러서 바로 달력이 뜨고, PC 는 showPicker() 로 띄운다.
+  function bindDatePicker($in, onPick) {
+    $in.addEventListener('click', e => {
+      e.stopPropagation();
+      try { $in.showPicker(); } catch {}
+    });
+    $in.addEventListener('change', () => { if (isDate($in.value)) onPick($in.value); });
+  }
+  function goDate(ds) {
+    if (!isDate(ds) || ds === viewDate) return;
+    viewDate = ds;
+    pickedDate = null;
+    render();
+  }
+  document.getElementById('date-prev').addEventListener('click', () => goDate(addDays(viewDate, -1)));
+  document.getElementById('date-next').addEventListener('click', () => goDate(addDays(viewDate, 1)));
+  document.getElementById('date-today').addEventListener('click', () => goDate(today));
+  bindDatePicker(document.getElementById('date-picker'), goDate);
+  bindDatePicker(document.getElementById('add-date-picker'), ds => {
+    pickedDate = ds === viewDate ? null : ds;
+    renderDateNav();
+    $input.focus();
   });
 
   /* ─────────── Form & Paste ─────────── */
@@ -1099,9 +1336,9 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
       .filter(c => c.checked)
       .map(c => pendingLines[+c.dataset.idx]);
     if (chosen.length === 0) { closePasteModal(); return; }
-    addTasksBulk(chosen);
+    const added = addTasksBulk(chosen);
     closePasteModal();
-    flashAddedToast(chosen.length);
+    if (added.length) flashAddedToast(added.length);
   });
 
   function flashAddedToast(n) {
@@ -1327,7 +1564,8 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
   // history/{id} 는 완료 기록(예전 시트 「완료기록」): 완료하면 쓰고, 완료를 취소하면 지운다. 할 일을 지워도 기록은 남는다.
   // 네오 도구(개발팀\할일-연동\store.js)도 같은 규칙으로 쓴다.
   const MAX_TEXT = 2000;   // firestore.rules 의 글자 수 한도와 같다
-  const FIELDS = ['id', 'text', 'done', 'priority', 'category', 'createdAt', 'completedAt'];
+  // date 까지 함께 적는다 — store.js normalize·firestore.rules 와 목록이 같아야 한다(한쪽만 빠지면 쓸 때마다 날짜가 지워진다).
+  const FIELDS = ['id', 'text', 'done', 'priority', 'category', 'createdAt', 'completedAt', 'date'];
   let remote = new Map();   // 마지막으로 받은(또는 보낸) 상태
   let unsubscribe = null;
 
@@ -1343,6 +1581,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
       id: String(t.id), text: String(t.text || ''), done: !!t.done,
       priority: normalizePriority(t.priority), category: normalizeCategory(t.category),
       createdAt: num(t.createdAt), completedAt: t.done ? num(t.completedAt) : null,
+      date: isDate(t.date) ? t.date : null,
     };
   }
   const same = (a, b) => FIELDS.every(k => a[k] === b[k]);

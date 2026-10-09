@@ -15,10 +15,11 @@ service cloud.firestore {
       return v == null || v is number;
     }
 
-    // todos/{id}: { id, text, done, priority, category, createdAt, completedAt }
+    // todos/{id}: { id, text, done, priority, category, createdAt, completedAt, date }
+    // date 는 'YYYY-MM-DD'(서울 기준 할 일 날짜, 2026-10-09 추가). 날짜 기능 전의 화면이 캐시돼 있어도 저장이 막히지 않게 필수는 아니다.
     function validTodo(id) {
       let d = request.resource.data;
-      return d.keys().hasOnly(['id', 'text', 'done', 'priority', 'category', 'createdAt', 'completedAt'])
+      return d.keys().hasOnly(['id', 'text', 'done', 'priority', 'category', 'createdAt', 'completedAt', 'date'])
         && d.keys().hasAll(['id', 'text', 'done', 'priority', 'category', 'createdAt', 'completedAt'])
         && d.id == id
         && d.text is string && d.text.size() <= 2000
@@ -26,7 +27,8 @@ service cloud.firestore {
         && d.priority in ['A', 'B', 'C', 'D']
         && d.category in ['work', 'home']
         && optNumber(d.createdAt)
-        && optNumber(d.completedAt);
+        && optNumber(d.completedAt)
+        && (d.get('date', null) == null || (d.date is string && d.date.matches('^\\d{4}-\\d{2}-\\d{2}$')));
     }
 
     // history/{id}: 완료 기록 { date, time, priority, text, id, completedAt }
